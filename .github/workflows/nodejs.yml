@@ -26,6 +26,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     # - run: npm ci
     # - run: npm run build --if-present
-    - run: cd ./api-challenge && npm run test
+    - run: cd ./api-challenge && npm install && npm run test
       env:
         CI: true
