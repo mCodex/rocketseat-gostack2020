@@ -1,11 +1,40 @@
 const express = require('express');
-const uuid = require('uuid/v4');
+const { uuid, isUuid } = require('uuidv4');
 
 const app = express();
 
 app.use(express.json());
 
 const projects = [];
+
+/**
+ * Middlewares
+ */
+
+const logRequest = (req, res, next) => {
+  const { method, url } = req;
+
+  const logLabel = `[${method.toUpperCase()}] ${url}`;
+
+  console.time(logLabel); //eslint-disable-line
+
+  next();
+
+  console.timeEnd(logLabel); //eslint-disable-line
+};
+
+const validateProjectId = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!isUuid(id)) {
+    return res.status(400).json({ error: 'Invalid Project ID' });
+  }
+
+  return next();
+};
+
+app.use(logRequest);
+app.use('/projects/:id', validateProjectId);
 
 /**
  * API logic starts here
