@@ -1,7 +1,6 @@
-const express = require("express");
-const cors = require("cors");
-
-// const { uuid } = require("uuidv4");
+const express = require('express');
+const cors = require('cors');
+const { uuid, isUuid } = require('uuidv4');
 
 const app = express();
 
@@ -10,24 +9,90 @@ app.use(cors());
 
 const repositories = [];
 
-app.get("/repositories", (request, response) => {
-  // TODO
+const checkIfRepositoryExists = (req, res, next) => {
+  const { id } = req.params;
+
+  if (!isUuid(id)) {
+    return res.status(400).json({ message: 'ID is not an UUID' });
+  }
+
+  const repositoryIndex = repositories.findIndex((r) => r.id === id);
+
+  if (repositoryIndex < 0) {
+    return res.status(400).json({ message: 'Repository not found' });
+  }
+
+  return next();
+};
+
+app.use('/repositories/:id', checkIfRepositoryExists);
+
+app.get('/repositories', (req, res) => res.json(repositories));
+
+app.post('/repositories', (req, res) => {
+  const { title, url, techs } = req.body;
+
+  const id = uuid();
+
+  const repository = {
+    id,
+    title,
+    url,
+    techs,
+    likes: 0,
+  };
+
+  repositories.push(repository);
+
+  return res.json(repository);
 });
 
-app.post("/repositories", (request, response) => {
-  // TODO
+app.put('/repositories/:id', (req, res) => {
+  const { id } = req.params;
+
+  const {
+    title, url, techs,
+  } = req.body;
+
+  const repositoryIndex = repositories.findIndex((r) => r.id === id);
+
+
+  const updatedRepository = {
+    id,
+    title,
+    url,
+    techs,
+    likes: repositories[repositoryIndex].likes,
+  };
+
+  repositories[repositoryIndex] = updatedRepository;
+
+  return res.json(updatedRepository);
 });
 
-app.put("/repositories/:id", (request, response) => {
-  // TODO
+app.delete('/repositories/:id', (req, res) => {
+  const { id } = req.params;
+
+  const repositoryIndex = repositories.findIndex((p) => p.id === id);
+
+  repositories.splice(repositoryIndex, 1);
+
+  return res.status(204).send();
 });
 
-app.delete("/repositories/:id", (request, response) => {
-  // TODO
-});
+app.post('/repositories/:id/like', (req, res) => {
+  const { id } = req.params;
 
-app.post("/repositories/:id/like", (request, response) => {
-  // TODO
+  const repositoryIndex = repositories.findIndex((r) => r.id === id);
+
+  const updatedRepository = {
+    ...repositories[repositoryIndex],
+    likes: repositories[repositoryIndex].likes += 1,
+  };
+
+  repositories[repositoryIndex] = updatedRepository;
+
+  return res.json({ likes: repositories[repositoryIndex].likes });
 });
 
 module.exports = app;
