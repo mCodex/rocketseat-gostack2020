@@ -9,6 +9,10 @@ The challenge consists in building an CRUD repository API.
 * [ExpressJS](https://expressjs.com/) 
 * [Jest](https://jestjs.io/)
 
+## Docs
+
+I have exported my Insomnia's Workspace and it can be found [here](./docs)
+
 ## 📦 Installation
 
 It is easy, just run:
