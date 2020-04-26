@@ -7,7 +7,3 @@ This is a monorepo including all source codes from new Rocketseat's GoStack Modu
 All projects are linted by:
 
 * [Airbnb's ESlint](https://www.npmjs.com/package/eslint-config-airbnb)
-
-# NodeJS Challenge
-
-Can be found [here](./api-challenge).
