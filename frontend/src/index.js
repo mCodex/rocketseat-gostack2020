@@ -1,12 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { SWRConfig } from 'swr';
 
-import App from './App';
+import App from './pages/Home';
+
 import * as serviceWorker from './serviceWorker';
+
+import api from './services/api';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <SWRConfig
+      value={{
+        fetcher: (...args) => api(...args).then((res) => res.data),
+      }}
+    >
+      <App />
+    </SWRConfig>
   </React.StrictMode>,
   document.getElementById('root')
 );
