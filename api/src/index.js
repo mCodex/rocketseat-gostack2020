@@ -57,7 +57,7 @@ app.post('/projects', (req, res) => {
 
   projects.push(project);
 
-  return res.json(projects);
+  return res.json(project);
 });
 
 app.put('/projects/:id', (req, res) => {
