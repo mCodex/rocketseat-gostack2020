@@ -3,6 +3,8 @@ import { verify } from 'jsonwebtoken';
 
 import authConfig from '../config/Auth';
 
+import AppError from '../errors/AppError';
+
 interface TokenPayload {
   iat: number;
   exp: number;
@@ -13,7 +15,7 @@ export default (req: Request, res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    throw new Error('Token is missing');
+    throw new AppError('Token is missing', 401);
   }
 
   const [, token] = authHeader.split(' ');
@@ -29,6 +31,6 @@ export default (req: Request, res: Response, next: NextFunction): void => {
 
     return next();
   } catch {
-    throw new Error('Invalid Token');
+    throw new AppError('Invalid Token', 401);
   }
 };
