@@ -5,6 +5,7 @@ import CreateUserService from '../services/CreateUserService';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
 
 import UploadConfig from '../config/Upload';
+import UpdateUserAvatarService from '../services/UpdateUserAvatarService';
 
 const usersRouter = Router();
 
@@ -33,7 +34,20 @@ usersRouter.patch(
   ensureAuthenticated,
   upload.single('avatar'),
   async (req, res) => {
-    return res.json({ message: 'Upload completed' });
+    try {
+      const uploadService = new UpdateUserAvatarService();
+
+      const user = await uploadService.execute({
+        user_id: req.user.id,
+        avatarFilename: req.file.filename,
+      });
+
+      delete user.password;
+
+      return res.json(user);
+    } catch (err) {
+      return res.status(400).json({ message: err.message });
+    }
   },
 );
 
