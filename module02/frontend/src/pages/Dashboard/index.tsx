@@ -16,6 +16,7 @@ interface Repository {
     avatar_url: string;
   };
 }
+
 const Dashboard: React.FC = () => {
   const [newRepo, setNewRepo] = useState('');
   const [repositories, setRepositories] = useState<Repository[]>(() => {
