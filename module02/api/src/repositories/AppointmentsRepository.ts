@@ -1,4 +1,3 @@
-import { isEqual } from 'date-fns';
 import { Repository, EntityRepository } from 'typeorm';
 import Appointment from '../models/Appointment';
 
