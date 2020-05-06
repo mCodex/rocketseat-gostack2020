@@ -5,13 +5,12 @@ import 'express-async-errors';
 import cors from 'cors';
 import helmet from 'helmet';
 
-import AppError from './errors/AppError';
-
-import uploadConfig from './config/Upload';
+import uploadConfig from '@config/Upload';
+import AppError from '@shared/errors/AppError';
 
 import routes from './routes';
 
-import './database';
+import '@shared/infra/typeorm';
 
 const app = express();
 const port = process.env.PORT || 3333;
