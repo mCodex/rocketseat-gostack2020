@@ -8,10 +8,10 @@ import helmet from 'helmet';
 import uploadConfig from '@config/Upload';
 import AppError from '@shared/errors/AppError';
 
-import routes from './routes';
-
 import '@shared/infra/typeorm';
 import '@shared/container/index';
+
+import routes from './routes';
 
 const app = express();
 const port = process.env.PORT || 3333;
