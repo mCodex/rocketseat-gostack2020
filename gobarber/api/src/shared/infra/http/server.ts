@@ -20,7 +20,7 @@ const app = express();
 const port = process.env.PORT || 3333;
 
 app.use(rateLimiter);
-app.use(helmet());
+app.use(helmet({ hidePoweredBy: true }));
 app.use(cors());
 app.use(express.json());
 
@@ -30,6 +30,8 @@ app.use(routes);
 app.use(errors());
 
 app.use((err: Error, req: Request, res: Response, _: NextFunction) => {
+  res.removeHeader('X-Powered-By');
+
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       status: 'error',

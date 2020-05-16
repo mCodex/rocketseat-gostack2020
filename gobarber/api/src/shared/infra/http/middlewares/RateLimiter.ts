@@ -16,7 +16,7 @@ const redisClient = redis.createClient({
 const limiter = new RateLimiterRedis({
   storeClient: redisClient,
   keyPrefix: 'rateLimit',
-  points: 5,
+  points: 1,
   duration: 1,
 });
 
@@ -26,9 +26,22 @@ export default async function rateLimiter(
   next: NextFunction,
 ): Promise<void> {
   try {
-    await limiter.consume(req.ip);
+    const rateLimitRes = await limiter.consume(req.ip);
+
+    res.set({
+      'Retry-After': rateLimitRes.msBeforeNext / 1000,
+      'X-RateLimit-Limit': 5,
+      'X-RateLimit-Remaining': rateLimitRes.remainingPoints,
+      'X-RateLimit-Reset': new Date(Date.now() + rateLimitRes.msBeforeNext),
+    });
     return next();
-  } catch {
+  } catch (ex) {
+    res.set({
+      'Retry-After': ex.msBeforeNext / 1000,
+      'X-RateLimit-Limit': 5,
+      'X-RateLimit-Remaining': ex.remainingPoints,
+      'X-RateLimit-Reset': new Date(Date.now() + ex.msBeforeNext),
+    });
     throw new AppError('Too many requests', 429);
   }
 }
