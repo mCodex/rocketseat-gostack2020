@@ -1,3 +1,5 @@
 # TMP
 tmp/*
 !tmp/.gitkeep
+
+ormconfig.json
