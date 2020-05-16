@@ -8,16 +8,18 @@ import cors from 'cors';
 import helmet from 'helmet';
 
 import uploadConfig from '@config/Upload';
-import AppError from '@shared/errors/AppError';
 
+import AppError from '@shared/errors/AppError';
 import '@shared/infra/typeorm';
 import '@shared/container/index';
+import rateLimiter from './middlewares/RateLimiter';
 
 import routes from './routes';
 
 const app = express();
 const port = process.env.PORT || 3333;
 
+app.use(rateLimiter);
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
