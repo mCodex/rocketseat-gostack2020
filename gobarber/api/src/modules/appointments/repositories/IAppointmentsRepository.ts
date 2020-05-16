@@ -10,7 +10,7 @@ export default interface IAppointmentsRepository {
   findAllInMonthFromProvider(
     data: IFindByAllInMonthFromProviderDTO,
   ): Promise<Appointment[]>;
-  findAllInMonthFromProvider(
+  findAllInDayFromProvider(
     data: IFindByAllInDayFromProviderDTO,
   ): Promise<Appointment[]>;
 }
