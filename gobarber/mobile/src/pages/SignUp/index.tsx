@@ -1,9 +1,10 @@
 import React, { useRef, useCallback } from 'react';
-import { Image } from 'react-native';
+import { Image, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TextInput } from 'react-native-gesture-handler';
@@ -13,6 +14,8 @@ import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
+import getValidationErrors from '../../utils/getValidationErrors';
+
 import {
   Container,
   Title,
@@ -20,16 +23,53 @@ import {
   BackToSignInButtonText,
 } from './styles';
 
+interface ISignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
-  const handleSignUp = useCallback(async (data: object) => {
-    console.log(data);
-  }, []);
+  const handleSignUp = useCallback(async (data: ISignUpFormData): Promise<
+    void
+  > => {
+    try {
+      formRef.current?.setErrors({});
 
+      const schema = Yup.object().shape({
+        name: Yup.string().required('Nome obrigatório'),
+        email: Yup.string()
+          .email('E-mail digitado é inválido')
+          .required('E-mail obrigatório'),
+        password: Yup.string().min(6, 'Senha no mínimo 6 digítos'),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      Alert.alert(
+        'Cadastro realizado',
+        'Você já pode fazer seu logon no Go Barber.',
+      );
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+        formRef.current?.setErrors(errors);
+
+        return;
+      }
+      Alert.alert(
+        'Erro no cadastro',
+        'Ocorreu um erro ao fazer o cadastro tente novamente.',
+      );
+    }
+  }, []);
   return (
     <SafeAreaView
       style={{
@@ -50,7 +90,7 @@ const SignIn: React.FC = () => {
             autoCapitalize="words"
             keyboardAppearance="dark"
             returnKeyType="next"
-            onSubmitEditing={() => emailRef.current.focus()}
+            onSubmitEditing={() => emailRef.current?.focus()}
           />
 
           <Input
@@ -63,7 +103,7 @@ const SignIn: React.FC = () => {
             autoCapitalize="none"
             keyboardAppearance="dark"
             returnKeyType="next"
-            onSubmitEditing={() => passwordRef.current.focus()}
+            onSubmitEditing={() => passwordRef.current?.focus()}
           />
 
           <Input
