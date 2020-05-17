@@ -1,14 +1,17 @@
-import React from 'react'
-import { View, Text } from 'react-native'
+import React from 'react';
+import { View, StatusBar } from 'react-native';
 
-const App:React.FC = () => {
+import Routes from './routes';
+
+import colors from './colors';
+
+const App: React.FC = () => {
   return (
-    <View>
-      <Text>
-        Hello World
-      </Text>
+    <View style={{ flex: 1, backgroundColor: colors.black }}>
+      <StatusBar barStyle="light-content" backgroundColor={colors.black} />
+      <Routes />
     </View>
-  )
-}
+  );
+};
 
-export default App
+export default App;
