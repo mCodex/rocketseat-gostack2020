@@ -16,6 +16,8 @@ import Input from '../../components/Input';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 
+import api from '../../services/api';
+
 import {
   Container,
   Title,
@@ -53,9 +55,17 @@ const SignIn: React.FC = () => {
         abortEarly: false,
       });
 
+      await api.post('/users', data);
+
       Alert.alert(
         'Cadastro realizado',
         'Você já pode fazer seu logon no Go Barber.',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ],
       );
     } catch (err) {
       if (err instanceof Yup.ValidationError) {
@@ -64,12 +74,14 @@ const SignIn: React.FC = () => {
 
         return;
       }
+
       Alert.alert(
         'Erro no cadastro',
         'Ocorreu um erro ao fazer o cadastro tente novamente.',
       );
     }
   }, []);
+
   return (
     <SafeAreaView
       style={{
