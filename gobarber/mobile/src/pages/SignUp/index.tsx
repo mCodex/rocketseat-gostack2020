@@ -6,6 +6,7 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TextInput } from 'react-native-gesture-handler';
 import colors from '../../colors';
 import logoImg from '../../assets/logo.png';
 
@@ -21,7 +22,8 @@ import {
 
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
   const handleSignUp = useCallback(async (data: object) => {
@@ -41,11 +43,40 @@ const SignIn: React.FC = () => {
         <Title>Crie sua conta</Title>
 
         <Form ref={formRef} onSubmit={handleSignUp}>
-          <Input name="name" icon="user" placeholder="Nome" />
+          <Input
+            name="name"
+            icon="user"
+            placeholder="Nome"
+            autoCapitalize="words"
+            keyboardAppearance="dark"
+            returnKeyType="next"
+            onSubmitEditing={() => emailRef.current.focus()}
+          />
 
-          <Input name="email" icon="mail" placeholder="E-mail" />
+          <Input
+            ref={emailRef}
+            name="email"
+            icon="mail"
+            placeholder="E-mail"
+            keyboardType="email-address"
+            autoCorrect={false}
+            autoCapitalize="none"
+            keyboardAppearance="dark"
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current.focus()}
+          />
 
-          <Input name="password" icon="lock" placeholder="Senha" />
+          <Input
+            ref={passwordRef}
+            name="password"
+            icon="lock"
+            placeholder="Senha"
+            secureTextEntry
+            keyboardAppearance="dark"
+            textContentType="newPassword"
+            returnKeyType="send"
+            onSubmitEditing={() => formRef.current?.submitForm()}
+          />
 
           <Button onPress={() => formRef.current?.submitForm()}>
             Cadastrar
