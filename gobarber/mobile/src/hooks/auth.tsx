@@ -21,6 +21,7 @@ interface ISignInCredentials {
 
 interface IAuthContextData {
   user: object;
+  loading: boolean;
   signIn(credentials: ISignInCredentials): Promise<void>;
   signOut(): void;
 }
@@ -29,6 +30,7 @@ const AuthContext = createContext<IAuthContextData>({} as IAuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<IAuthState>({} as IAuthState);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadDataFromAS = async (): Promise<void> => {
@@ -40,6 +42,7 @@ const AuthProvider: React.FC = ({ children }) => {
           user: JSON.parse(user[1]),
         });
       }
+      setLoading(false);
     };
     loadDataFromAS();
   }, []);
@@ -64,7 +67,7 @@ const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user: data.user, signIn, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
