@@ -10,27 +10,24 @@ import logoImg from '../../assets/logo.svg';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
-import { useAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 
 import getValidationErrors from '../../utils/getValidationErrors';
 
 import { Container, Content, Background, AnimationContainer } from './styles';
 
-interface SignInFormData {
+interface ForgotPasswordFormData {
   email: string;
-  password: string;
 }
 
-const SignIn: React.FC = () => {
+const ForgotPassword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const { signIn } = useAuth();
   const { addToast } = useToast();
   const history = useHistory();
 
   const handleSubmit = useCallback(
-    async (data: SignInFormData): Promise<void> => {
+    async (data: ForgotPasswordFormData): Promise<void> => {
       try {
         formRef.current?.setErrors({});
 
@@ -38,14 +35,11 @@ const SignIn: React.FC = () => {
           email: Yup.string()
             .email('E-mail digitado é inválido')
             .required('E-mail obrigatório'),
-          password: Yup.string().required('Senha obrigatória'),
         });
 
         await schema.validate(data, {
           abortEarly: false,
         });
-
-        await signIn({ email: data.email, password: data.password });
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -56,15 +50,14 @@ const SignIn: React.FC = () => {
 
         addToast({
           type: 'error',
-          title: 'Erro na autenticação',
-          description:
-            'Ocorreu um erro ao fazer login, cheque as credenciais e tente novamente.',
+          title: 'Erro na recuperação de senha',
+          description: 'Ocorreu um erro ao tentar recuperar sua senha.',
         });
 
-        history.push('/dashboard');
+        // history.push('/dashboard');
       }
     },
-    [signIn, addToast, history],
+    [addToast],
   );
 
   return (
@@ -73,7 +66,7 @@ const SignIn: React.FC = () => {
         <AnimationContainer>
           <img src={logoImg} alt="GoBarber" />
           <Form ref={formRef} onSubmit={handleSubmit} action="">
-            <h1>Faça seu logon</h1>
+            <h1>Recuperar Senha</h1>
 
             <Input
               type="email"
@@ -81,19 +74,12 @@ const SignIn: React.FC = () => {
               name="email"
               placeholder="Digite seu e-mail"
             />
-            <Input
-              type="password"
-              icon={FiLock}
-              name="password"
-              placeholder="Digite sua senha"
-            />
 
-            <Button type="submit">Entrar</Button>
-            <Link to="/forgot-password">Esqueci minha senha</Link>
+            <Button type="submit">Recuperar</Button>
           </Form>
-          <Link to="/signup">
+          <Link to="/signin">
             <FiLogIn />
-            Criar Conta
+            Voltar ao Login
           </Link>
         </AnimationContainer>
       </Content>
@@ -102,4 +88,4 @@ const SignIn: React.FC = () => {
   );
 };
 
-export default SignIn;
+export default ForgotPassword;
