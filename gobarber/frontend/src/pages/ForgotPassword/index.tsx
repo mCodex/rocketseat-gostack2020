@@ -2,7 +2,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { FiLogIn, FiMail } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import * as Yup from 'yup';
 
 import logoImg from '../../assets/logo.svg';
@@ -27,7 +27,6 @@ const ForgotPassword: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
   const { addToast } = useToast();
-  const history = useHistory();
 
   const handleSubmit = useCallback(
     async (data: ForgotPasswordFormData): Promise<void> => {
@@ -68,8 +67,6 @@ const ForgotPassword: React.FC = () => {
           title: 'Erro na recuperação de senha',
           description: 'Ocorreu um erro ao tentar recuperar sua senha.',
         });
-
-        // history.push('/dashboard');
       } finally {
         setLoading(false);
       }
@@ -83,7 +80,7 @@ const ForgotPassword: React.FC = () => {
         <AnimationContainer>
           <img src={logoImg} alt="GoBarber" />
           <Form ref={formRef} onSubmit={handleSubmit} action="">
-            <h1>Recuperar Senha</h1>
+            <h1>Recuperar senha</h1>
 
             <Input
               type="email"
