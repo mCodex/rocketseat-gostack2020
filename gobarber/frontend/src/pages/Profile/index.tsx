@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, ChangeEvent } from 'react';
 import { FiMail, FiLock, FiUser, FiCamera, FiArrowLeft } from 'react-icons/fi';
 import { Form } from '@unform/web';
 import { FormHandles } from '@unform/core';
@@ -19,7 +19,9 @@ import { useAuth } from '../../hooks/auth';
 interface ProfileData {
   name: string;
   email: string;
+  old_password: string;
   password: string;
+  password_confirmation: string;
 }
 
 const Profile: React.FC = () => {
@@ -27,7 +29,7 @@ const Profile: React.FC = () => {
   const { addToast } = useToast();
   const history = useHistory();
 
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const handleSubmit = useCallback(
     async (data: ProfileData): Promise<void> => {
@@ -39,19 +41,47 @@ const Profile: React.FC = () => {
           email: Yup.string()
             .email('E-mail digitado é inválido')
             .required('E-mail obrigatório'),
-          password: Yup.string().min(6, 'Senha no mínimo 6 digítos'),
+          old_password: Yup.string(),
+          password: Yup.string().when('old_password', {
+            is: (val) => !!val.length,
+            then: Yup.string().required('Campo Obrigatório'),
+            otherwise: Yup.string(),
+          }),
+          password_confirmation: Yup.string()
+            .when('old_password', {
+              is: (val) => !!val.length,
+              then: Yup.string().required('Campo Obrigatório'),
+              otherwise: Yup.string(),
+            })
+            .oneOf(
+              [Yup.ref('password'), null],
+              'Senha e confirmação precisam ser iguais',
+            ),
         });
 
         await schema.validate(data, {
           abortEarly: false,
         });
 
-        await api.post('/users', data);
+        const formData = {
+          name: data.name,
+          email: data.email,
+
+          ...(data.old_password && {
+            old_password: data.old_password,
+            password: data.password,
+            password_confirmation: data.password_confirmation,
+          }),
+        };
+
+        const response = await api.put('/profile', formData);
+
+        updateUser(response.data);
 
         addToast({
           type: 'success',
-          title: 'Cadastro realizado',
-          description: 'Você já pode fazer seu logon no Go Barber',
+          title: 'Perfil atualizado',
+          description: 'Informações atualizadas com sucesso',
         });
 
         history.push('/');
@@ -65,12 +95,33 @@ const Profile: React.FC = () => {
 
         addToast({
           type: 'error',
-          title: 'Erro no cadastro',
-          description: 'Ocorreu um erro ao fazer o cadastro tente novamente.',
+          title: 'Erro na atualização',
+          description:
+            'Ocorreu um erro ao atualizar o perfil, tente novamente.',
         });
       }
     },
-    [addToast, history],
+    [addToast, history, updateUser],
+  );
+
+  const handleAvatarChange = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files) {
+        const data = new FormData();
+
+        data.append('avatar', e.target.files[0]);
+
+        const response = await api.patch('/users/avatar', data);
+
+        updateUser(response.data);
+
+        addToast({
+          type: 'success',
+          title: 'Avatar atualizado com sucesso',
+        });
+      }
+    },
+    [addToast, updateUser],
   );
 
   return (
@@ -93,9 +144,15 @@ const Profile: React.FC = () => {
         >
           <AvatarInput>
             <img src={user.avatar_url} alt={user.name} />
-            <button type="button">
+            <label htmlFor="avatar">
               <FiCamera />
-            </button>
+              <input
+                type="file"
+                name="avatar"
+                id="avatar"
+                onChange={handleAvatarChange}
+              />
+            </label>
           </AvatarInput>
 
           <h1>Meu Perfil</h1>
