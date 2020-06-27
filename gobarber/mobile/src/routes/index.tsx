@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 
 import AuthRoutes from './auth.routes';
 import AppRoutes from './app.routes';
@@ -17,7 +18,11 @@ const Routes: React.FC = () => {
     );
   }
 
-  return user ? <AppRoutes /> : <AuthRoutes />;
+  return (
+    <NavigationContainer>
+{      user ? <AppRoutes /> : <AuthRoutes />}
+    </NavigationContainer>
+  );
 };
 
 export default Routes;
